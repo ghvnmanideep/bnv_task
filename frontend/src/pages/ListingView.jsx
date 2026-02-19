@@ -20,8 +20,8 @@ const ListingView = () => {
         setLoading(true);
         try {
             const { data } = await getUsers({ page, search, status: statusFilter, limit: 5 });
-            setUsers(data.users);
-            setTotalPages(data.totalPages);
+            setUsers(data?.users || []);
+            setTotalPages(data?.totalPages || 1);
         } catch (error) {
             toast.error('Failed to fetch users');
         } finally {
@@ -130,7 +130,7 @@ const ListingView = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user, index) => (
+                            {users?.map((user, index) => (
                                 <tr key={user._id} style={{ borderBottom: '1px solid #dee2e6' }}>
                                     <td style={{ padding: '12px' }}>{(page - 1) * 5 + index + 1}</td>
                                     <td style={{ padding: '12px' }}>{`${user.firstName} ${user.lastName}`}</td>
