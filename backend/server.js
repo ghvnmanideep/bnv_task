@@ -49,8 +49,8 @@ if (process.env.NODE_ENV === "production" || process.env.RENDER) {
   const distPath = path.join(__dirname, "../frontend/dist");
   app.use(express.static(distPath));
 
-  // Catch-all route for SPA - using a more robust pattern for Express 5
-  app.get("*", (req, res, next) => {
+  // Catch-all route for SPA - compatible with Express 5
+  app.get('/:any*', (req, res, next) => {
     if (req.url.startsWith("/api") || req.url.startsWith("/uploads")) {
       return next();
     }
