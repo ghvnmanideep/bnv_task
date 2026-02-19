@@ -18,24 +18,32 @@ exports.createUser = async (req, res) => {
 // Get Users with Pagination & Search
 exports.getUsers = async (req, res) => {
     try {
+        console.log("Fetching users with query:", req.query);
         const {page=1,limit=5,search='',gender,status,sort}=req.query;
         const query = {$or:[{firstName:{$regex:search, $options: 'i' } },
                 {lastName:{$regex:search,$options:'i'}},{email:{$regex:search, $options:'i'}}]};
         if (gender) query.gender = gender;
         if (status) query.status = status;
         const sortQuery = sort === 'new' ? { createdAt: -1 } : sort === 'old' ? { createdAt: 1 } : { createdAt: -1 };
+        
+        console.log("Constructed MongoDB query:", JSON.stringify(query));
+        
         const users = await User.find(query)
             .sort(sortQuery)
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
         const count = await User.countDocuments(query);
+        
+        console.log(`Found ${users.length} users out of ${count} total`);
+        
         res.json({
             users,
             totalPages: Math.ceil(count / limit),
             currentPage: page
         });
     } catch (error) {
+        console.error("Get Users Error:", error);
         res.status(500).json({ message: error.message });
     }
 };
