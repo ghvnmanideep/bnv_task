@@ -1,8 +1,9 @@
 services:
   - type: web
-    name: bnv-portal
+    name: bnv-user-portal
     env: node
     plan: free
+    # Root build script handles everything (frontend + backend)
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
@@ -11,4 +12,4 @@ services:
       - key: MONGODB_URI
         fromContext: envVar
       - key: FRONTEND_URL
-        value: https://bnv-portal.onrender.com
+        value: https://bnv-user-portal.onrender.com
