@@ -8,9 +8,11 @@ const userRoutes = require("./routes/userRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Middleware & CORS Configuration
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "*",
+  origin: FRONTEND_URL,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 200
@@ -19,22 +21,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Static Files (Uploads)
+// Static Files & API Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// API Routes (Must be above static site handler)
 app.use("/api", userRoutes);
 
-// Serve Frontend in Production
+// SPA Support (Production only)
 if (process.env.NODE_ENV === "production" || process.env.RENDER) {
   const distPath = path.join(__dirname, "../frontend/dist");
   app.use(express.static(distPath));
 
-  app.get("/*", (req, res) => {
-    // Only handle if it's not an api route (redundant insurance)
-    if (!req.path.startsWith("/api")) {
-      res.sendFile(path.join(distPath, "index.html"));
-    }
+  // Express 5 compatible catch-all using regex
+  app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
   });
 }
 
