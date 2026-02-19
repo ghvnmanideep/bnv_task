@@ -15,19 +15,26 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Static Files (Uploads)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
+// API Routes (Must be above static site handler)
 app.use("/api", userRoutes);
 
 // Serve Frontend in Production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+if (process.env.NODE_ENV === "production" || process.env.RENDER) {
+  const distPath = path.join(__dirname, "../frontend/dist");
+  app.use(express.static(distPath));
 
   app.get("/*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
+    // Only handle if it's not an api route (redundant insurance)
+    if (!req.path.startsWith("/api")) {
+      res.sendFile(path.join(distPath, "index.html"));
+    }
   });
 }
 
