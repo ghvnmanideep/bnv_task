@@ -3,12 +3,15 @@ const { Parser } = require('json2csv');
 // Create User
 exports.createUser = async (req, res) => {
     try {
+        console.log("Creating user:", req.body);
         const {firstName,lastName,email,mobile,gender,status,location}=req.body;
         const profileImage=req.file?req.file.path:null;
         const newUser = new User({firstName,lastName,email,mobile,gender,status,profileImage,location});
         await newUser.save();
+        console.log("User created successfully:", newUser._id);
         res.status(201).json(newUser);
     } catch (error) {
+        console.error("Create User Error:", error);
         res.status(400).json({message:error.message });
     }
 };
